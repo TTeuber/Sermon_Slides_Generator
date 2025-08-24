@@ -1,0 +1,11 @@
+[project]
+name = "csbtext"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.13"
+dependencies = [
+    "beautifulsoup4==4.13.4",
+    "pypdf==6.0.0",
+    "requests==2.32.4",
+    "weasyprint==66.0",
+]
