@@ -157,7 +157,7 @@ def create_slide_pdf(title: str, text: str) -> Optional[bytes]:
         
         # Draw wrapped text
         y_position = 160
-        line_height = 50
+        line_height = 40
         
         for line in wrapped_text:
             if y_position > height - 100:  # Stop if we run out of space
@@ -177,4 +177,4 @@ def create_slide_pdf(title: str, text: str) -> Optional[bytes]:
         return None
 
 if __name__ == "__main__":
-    main("Passages/short.txt", 1)
+    main("Passages/test.txt", 1)
