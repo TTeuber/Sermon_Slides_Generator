@@ -8,4 +8,6 @@ dependencies = [
     "pypdf==6.0.0",
     "requests==2.32.4",
     "weasyprint==66.0",
+    "pywebview>=4.0.0",
+    "pillow>=10.0.0",
 ]
