@@ -1,2 +1,16 @@
 uv.lock
 .venv
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec.backup
+
+# Executables
+*.exe
+*.app
+SermonSlidesGenerator
+SermonSlidesGenerator.exe
+
+# macOS
+.DS_Store
