@@ -15,6 +15,8 @@ a = Analysis(
         ('templates/index.html', 'templates'),
         # Include font files
         ('JosefinSans-Medium.ttf', '.'),
+        # Include static assets
+        ('static/qr_code.png', 'static'),
     ],
     hiddenimports=[
         'webview',

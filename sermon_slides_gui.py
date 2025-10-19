@@ -12,7 +12,11 @@ from pathlib import Path
 from typing import Optional, Dict, Any
 
 import webview
-from sermon_slides_generator import generate_slides_for_passage, _fetch_passage_text
+from sermon_slides_generator import (
+    generate_slides_for_passage,
+    _fetch_passage_text,
+    create_title_slide_with_qr
+)
 from pypdf import PdfWriter
 import io
 
@@ -130,7 +134,21 @@ class SermonSlidesAPI:
             
             pdf_writer = PdfWriter()
             total_slides = 0
-            
+
+            # Generate title slide with QR code first
+            self._update_progress(0, 'Creating title slide...')
+            try:
+                title_slide_pdf = create_title_slide_with_qr(title.strip())
+                if title_slide_pdf:
+                    self._add_pdf_to_writer(pdf_writer, title_slide_pdf)
+                    total_slides += 1
+                    logger.info("Title slide with QR code created")
+                else:
+                    logger.warning("Failed to create title slide")
+            except Exception as e:
+                logger.error(f"Error creating title slide: {e}")
+                self._send_warning("Could not create title slide, continuing with passages...")
+
             for index, passage in enumerate(passages, 1):
                 # Update progress
                 progress = int((index - 1) / len(passages) * 100)

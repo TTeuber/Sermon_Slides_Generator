@@ -504,10 +504,10 @@ def _draw_text_content(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.Fre
 def _image_to_pdf(img: Image.Image) -> bytes:
     """
     Convert PIL Image to PDF bytes.
-    
+
     Args:
         img: PIL Image.
-        
+
     Returns:
         PDF content as bytes.
     """
@@ -515,6 +515,61 @@ def _image_to_pdf(img: Image.Image) -> bytes:
     img.save(buffer, format='PDF', quality=95, resolution=DPI)
     buffer.seek(0)
     return buffer.getvalue()
+
+
+def create_title_slide_with_qr(title: str, qr_size: int = 700) -> Optional[bytes]:
+    """
+    Create a title slide with QR code.
+
+    Args:
+        title: Sermon title to display at the top.
+        qr_size: Size of the QR code in pixels (default 700x700).
+
+    Returns:
+        PDF content as bytes, or None if creation fails.
+    """
+    try:
+        # Calculate dimensions
+        width = int(SLIDE_WIDTH_INCHES * DPI)
+        height = int(SLIDE_HEIGHT_INCHES * DPI)
+
+        # Create image
+        img = Image.new('RGB', (width, height), color=BACKGROUND_COLOR)
+        draw = ImageDraw.Draw(img)
+
+        # Load fonts
+        title_font, _ = _load_fonts()
+
+        # Draw title at the top
+        _draw_title(draw, title, title_font, width)
+
+        # Load and resize QR code image
+        qr_path = _get_resource_path("static/qr_code.png")
+
+        try:
+            qr_image = Image.open(qr_path)
+
+            # Resize QR code to specified size while maintaining aspect ratio
+            qr_image.thumbnail((qr_size, qr_size), Image.Resampling.LANCZOS)
+
+            # Calculate position to center QR code
+            # Position it in the vertical center of the remaining space after title
+            qr_x = (width - qr_image.width) // 2
+            qr_y = (height - qr_image.height) // 2 + 50  # Offset down a bit from center
+
+            # Paste QR code onto slide
+            img.paste(qr_image, (qr_x, qr_y))
+
+        except Exception as e:
+            logger.error(f"Error loading QR code image: {e}")
+            # Continue without QR code if image fails to load
+
+        # Convert to PDF
+        return _image_to_pdf(img)
+
+    except Exception as e:
+        logger.error(f"Error creating title slide with QR code: {e}")
+        return None
 
 if __name__ == "__main__":
     import sys
