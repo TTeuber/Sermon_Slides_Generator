@@ -37,7 +37,8 @@ class SermonSlidesAPI:
         """Open file dialog to select save location."""
         try:
             result = self.window.create_file_dialog(
-                webview.FOLDER_DIALOG,
+                # webview.FOLDER_DIALOG,
+                webview.FileDialog.FOLDER,
                 directory=self.save_location
             )
             

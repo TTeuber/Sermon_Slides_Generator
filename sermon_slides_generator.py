@@ -6,6 +6,7 @@ Retrieves scripture text and formats it into presentation slides.
 
 import io
 import logging
+import sys
 import textwrap
 from pathlib import Path
 from time import sleep
@@ -48,7 +49,19 @@ SEPARATOR_COLOR = '#3498db'
 # Font settings
 TITLE_FONT_SIZE = 48
 TEXT_FONT_SIZE = 36
-FONT_FILE = "JosefinSans-Medium.ttf"
+
+def _get_resource_path(relative_path: str) -> Path:
+    """Get absolute path to resource, works for dev and for PyInstaller."""
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = Path(sys._MEIPASS)
+    except AttributeError:
+        # Running in normal Python environment
+        base_path = Path(__file__).parent
+
+    return base_path / relative_path
+
+FONT_FILE = str(_get_resource_path("JosefinSans-Medium.ttf"))
 
 def main(file_path: str = "", sleep_time: float = DEFAULT_SLEEP_TIME) -> None:
     """
