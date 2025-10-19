@@ -37,8 +37,8 @@ TITLE_Y = 50
 SEPARATOR_Y = 120
 TEXT_START_Y = 160
 LINE_HEIGHT = 50
-MAX_LINES_PER_SLIDE = 10
-MAX_CHARS_PER_LINE = 90
+MAX_LINES_PER_SLIDE = 11
+MAX_CHARS_PER_LINE = 75
 
 # Colors
 BACKGROUND_COLOR = '#f8f9fa'
@@ -214,11 +214,17 @@ def _fetch_passage_text(search_term: str) -> List[str]:
         # Remove footnote markers (but keep verse numbers)
         _remove_footnotes(passage_div)
         
+        # Replace <br> tags with spaces for poetry formatting
+        for br in passage_div.find_all('br'):
+            br.replace_with(' ')
+        
         # Extract paragraph texts
         paragraphs = []
         for p_tag in passage_div.find_all('p'):
             text = p_tag.get_text().strip()
             if text:
+                # Clean up multiple spaces that might result from br replacements
+                text = ' '.join(text.split())
                 paragraphs.append(text)
         
         return paragraphs
