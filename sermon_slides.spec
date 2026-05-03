@@ -77,7 +77,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,  # Add icon file here if you have one
+    icon='church-slides-icon.icns',
 )
 
 coll = COLLECT(
@@ -96,7 +96,7 @@ if os.name == 'posix' and os.uname().sysname == 'Darwin':
     app = BUNDLE(
         coll,
         name='Sermon Slides Generator.app',
-        icon=None,  # Add icon file here if you have one
+        icon='church-slides-icon.icns',
         bundle_identifier='com.csbtext.sermonslides',
         version='1.0.0',
         info_plist={

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Tile background (macOS squircle approximation) -->
+  <rect width="1024" height="1024" rx="228" fill="#14532D"/>
+
+  <!-- Back slide -->
+  <rect x="220" y="320" width="584" height="400" rx="28" fill="#15803D"
+        transform="rotate(-7, 512, 520)"/>
+
+  <!-- Middle slide -->
+  <rect x="220" y="300" width="584" height="400" rx="28" fill="#4ADE80"
+        transform="rotate(-3, 512, 500)"/>
+
+  <!-- Front slide -->
+  <rect x="220" y="280" width="584" height="400" rx="28" fill="#FFFFFF"/>
+
+  <!-- Cross on front slide -->
+  <g fill="#14532D">
+    <rect x="487" y="340" width="50" height="280" rx="6"/>
+    <rect x="417" y="420" width="190" height="50" rx="6"/>
+  </g>
+</svg>
