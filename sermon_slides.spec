@@ -97,7 +97,7 @@ if os.name == 'posix' and os.uname().sysname == 'Darwin':
         coll,
         name='Sermon Slides Generator.app',
         icon='church-slides-icon.icns',
-        bundle_identifier='com.csbtext.sermonslides',
+        bundle_identifier='com.tylerteuber.sermonslides',
         version='1.0.0',
         info_plist={
             'NSPrincipalClass': 'NSApplication',
