@@ -1,14 +1,24 @@
 [project]
-name = "csbtext"
-version = "0.1.0"
-description = "Add your description here"
+name = "sermon-slides-generator"
+version = "1.0.0"
+description = "Desktop app that turns a list of Bible references into presentation-ready PDF slides"
+readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "beautifulsoup4==4.13.4",
     "pypdf==6.0.0",
     "requests==2.32.4",
-    "weasyprint==66.0",
     "pywebview>=4.0.0",
     "pillow>=10.0.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
     "pyinstaller>=6.0.0",
+    "pytest>=8.0.0",
+    "ruff>=0.6.0",
 ]
