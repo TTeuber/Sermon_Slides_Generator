@@ -12,10 +12,10 @@ Things that still need a human (or a future session) to finish. Roughly in prior
 
 ## Medium
 
-- [ ] **Make the QR code configurable.** `static/qr_code.png` is hardcoded (it's your church's link). Add a file-picker in the GUI to choose a QR/logo image, or a checkbox to skip the title-slide QR entirely. Makes the app generalize beyond your church and demos better.
-- [ ] **Rename the local project directory** from `csbText` to match the GitHub repo (`Sermon_Slides_Generator`) — cosmetic, but the mismatch shows up in IDE screenshots and paths. The package name in `pyproject.toml` is already updated.
-- [ ] **Update the bundle identifier** in `sermon_slides.spec` (`com.csbtext.sermonslides` → something like `com.tylerteuber.sermonslides`) to match the new project name.
-- [ ] **More tests with mocked HTML.** `fetch_passage_text` and `_remove_footnotes` can be tested offline by feeding saved BibleGateway HTML fixtures to BeautifulSoup — good demonstration of testing scraping code without network calls.
+- [x] **Make the QR code configurable.** The GUI now has a checkbox to skip the title-slide QR and a file-picker to choose a custom QR/logo image (with a reset-to-default button). Transparent PNGs are composited correctly.
+- [x] **Rename the local project directory** from `csbText` to match the GitHub repo (`Sermon_Slides_Generator`).
+- [x] **Update the bundle identifier** in `sermon_slides.spec` (`com.csbtext.sermonslides` → `com.tylerteuber.sermonslides`).
+- [x] **More tests with mocked HTML.** `tests/test_passage_fetching.py` feeds saved BibleGateway HTML fixtures (`tests/fixtures/`) to `fetch_passage_text` and `_remove_footnotes` with `requests.get` mocked — no network calls.
 
 ## Nice to have
 
