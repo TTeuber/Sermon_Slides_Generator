@@ -30,6 +30,7 @@ class SermonSlidesAPI:
     def __init__(self):
         self.window = None
         self.save_location = str(Path.home())
+        self.qr_image_path = None  # None = use the bundled default QR code
         self.is_generating = False
         
     def set_window(self, window):
@@ -63,6 +64,37 @@ class SermonSlidesAPI:
                 'message': str(e)
             }
     
+    def select_qr_image(self):
+        """Open file dialog to choose a custom QR/logo image for the title slide."""
+        try:
+            result = self.window.create_file_dialog(
+                webview.FileDialog.OPEN,
+                file_types=('Image files (*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.webp)',)
+            )
+
+            if result and len(result) > 0:
+                self.qr_image_path = result[0]
+                return {
+                    'success': True,
+                    'path': self.qr_image_path
+                }
+
+            return {
+                'success': False,
+                'message': 'No image selected'
+            }
+        except Exception as e:
+            logger.error(f"Error selecting QR image: {e}")
+            return {
+                'success': False,
+                'message': str(e)
+            }
+
+    def reset_qr_image(self):
+        """Revert to the bundled default QR code."""
+        self.qr_image_path = None
+        return {'success': True}
+
     def validate_passage(self, passage: str) -> Dict[str, Any]:
         """Validate a single Bible passage reference."""
         try:
@@ -86,22 +118,23 @@ class SermonSlidesAPI:
                 'message': str(e)
             }
     
-    def generate_pdf(self, title: str, passages_text: str, save_location: str = None) -> Dict[str, Any]:
+    def generate_pdf(self, title: str, passages_text: str, save_location: str = None,
+                     include_qr: bool = True) -> Dict[str, Any]:
         """Generate PDF slides from the provided passages."""
         if self.is_generating:
             return {
                 'success': False,
                 'message': 'Generation already in progress'
             }
-        
+
         # Use provided save location or default
         if save_location:
             self.save_location = save_location
-            
+
         # Start generation in a separate thread
         thread = threading.Thread(
             target=self._generate_pdf_thread,
-            args=(title, passages_text)
+            args=(title, passages_text, include_qr)
         )
         thread.daemon = True
         thread.start()
@@ -111,7 +144,7 @@ class SermonSlidesAPI:
             'message': 'Generation started'
         }
     
-    def _generate_pdf_thread(self, title: str, passages_text: str):
+    def _generate_pdf_thread(self, title: str, passages_text: str, include_qr: bool = True):
         """Generate PDF in a separate thread with progress updates."""
         self.is_generating = True
         
@@ -137,7 +170,11 @@ class SermonSlidesAPI:
             # Generate title slide with QR code first
             self._update_progress(0, 'Creating title slide...')
             try:
-                title_slide_pdf = create_title_slide_with_qr(title.strip())
+                title_slide_pdf = create_title_slide_with_qr(
+                    title.strip(),
+                    qr_path=self.qr_image_path,
+                    include_qr=include_qr
+                )
                 if title_slide_pdf:
                     add_pdf_to_writer(pdf_writer, title_slide_pdf)
                     total_slides += 1

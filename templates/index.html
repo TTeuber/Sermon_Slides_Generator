@@ -147,6 +147,7 @@
         .form-group:nth-child(1) { animation-delay: 0.25s; }
         .form-group:nth-child(2) { animation-delay: 0.3s; }
         .form-group:nth-child(3) { animation-delay: 0.35s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
 
         label {
             display: block;
@@ -191,6 +192,33 @@
         .file-selector {
             display: flex;
             gap: 8px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .checkbox-row label {
+            margin-bottom: 0;
+            font-weight: 400;
+            font-size: 14px;
+            color: var(--text-dim);
+            cursor: pointer;
+        }
+
+        .file-selector.disabled {
+            opacity: 0.35;
+            pointer-events: none;
         }
 
         .file-path {
@@ -405,6 +433,20 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Title Slide QR Code</label>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="includeQr" checked>
+                        <label for="includeQr">Include a QR code / logo on the title slide</label>
+                    </div>
+                    <div class="file-selector" id="qrSelector">
+                        <div class="file-path" id="qrPath">Default QR code</div>
+                        <button type="button" class="btn btn-secondary" id="qrBrowseBtn" onclick="selectQrImage()">Browse</button>
+                        <button type="button" class="btn btn-secondary" id="qrResetBtn" onclick="resetQrImage()" style="display: none;">Reset</button>
+                    </div>
+                    <div class="help-text">Pick your own QR code or logo image, or uncheck to skip it</div>
+                </div>
+
+                <div class="form-group">
                     <label for="saveLocation">Save Location</label>
                     <div class="file-selector">
                         <div class="file-path" id="saveLocation">Select folder...</div>
@@ -439,6 +481,32 @@
             }
         });
 
+        document.getElementById('includeQr').addEventListener('change', (e) => {
+            document.getElementById('qrSelector').classList.toggle('disabled', !e.target.checked);
+        });
+
+        async function selectQrImage() {
+            try {
+                const result = await pywebview.api.select_qr_image();
+                if (result.success) {
+                    document.getElementById('qrPath').textContent = result.path;
+                    document.getElementById('qrResetBtn').style.display = '';
+                }
+            } catch (error) {
+                showMessage('Error selecting image: ' + error, 'error');
+            }
+        }
+
+        async function resetQrImage() {
+            try {
+                await pywebview.api.reset_qr_image();
+                document.getElementById('qrPath').textContent = 'Default QR code';
+                document.getElementById('qrResetBtn').style.display = 'none';
+            } catch (error) {
+                showMessage('Error resetting image: ' + error, 'error');
+            }
+        }
+
         async function selectFolder() {
             try {
                 const result = await pywebview.api.select_save_location();
@@ -471,8 +539,10 @@
             document.getElementById('progressContainer').style.display = 'block';
             document.getElementById('message').style.display = 'none';
 
+            const includeQr = document.getElementById('includeQr').checked;
+
             try {
-                const result = await pywebview.api.generate_pdf(title, passages, saveLocation);
+                const result = await pywebview.api.generate_pdf(title, passages, saveLocation, includeQr);
                 if (!result.success) {
                     showMessage(result.message, 'error');
                     setFormEnabled(true);
@@ -514,8 +584,9 @@
         function setFormEnabled(enabled) {
             document.getElementById('title').disabled = !enabled;
             document.getElementById('passages').disabled = !enabled;
+            document.getElementById('includeQr').disabled = !enabled;
             document.getElementById('generateBtn').disabled = !enabled;
-            document.querySelector('.btn-secondary').disabled = !enabled;
+            document.querySelectorAll('.btn-secondary').forEach(btn => btn.disabled = !enabled);
         }
     </script>
 </body>

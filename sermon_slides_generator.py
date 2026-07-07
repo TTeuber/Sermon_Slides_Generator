@@ -517,13 +517,21 @@ def _image_to_pdf(img: Image.Image) -> bytes:
     return buffer.getvalue()
 
 
-def create_title_slide_with_qr(title: str, qr_size: int = 700) -> Optional[bytes]:
+def create_title_slide_with_qr(
+    title: str,
+    qr_size: int = 700,
+    qr_path: Optional[str] = None,
+    include_qr: bool = True,
+) -> Optional[bytes]:
     """
-    Create a title slide with QR code.
+    Create a title slide, optionally with a QR code or logo image.
 
     Args:
         title: Sermon title to display at the top.
         qr_size: Size of the QR code in pixels (default 700x700).
+        qr_path: Path to a custom QR/logo image. Falls back to the
+                 bundled static/qr_code.png when not provided.
+        include_qr: When False, generate a title-only slide with no image.
 
     Returns:
         PDF content as bytes, or None if creation fails.
@@ -543,11 +551,14 @@ def create_title_slide_with_qr(title: str, qr_size: int = 700) -> Optional[bytes
         # Draw title at the top
         _draw_title(draw, title, title_font, width)
 
-        # Load and resize QR code image
-        qr_path = _get_resource_path("static/qr_code.png")
+        if not include_qr:
+            return _image_to_pdf(img)
+
+        # Load and resize QR code image (custom path or bundled default)
+        image_path = Path(qr_path) if qr_path else _get_resource_path("static/qr_code.png")
 
         try:
-            qr_image = Image.open(qr_path)
+            qr_image = Image.open(image_path)
 
             # Resize QR code to specified size while maintaining aspect ratio
             qr_image.thumbnail((qr_size, qr_size), Image.Resampling.LANCZOS)
@@ -557,8 +568,12 @@ def create_title_slide_with_qr(title: str, qr_size: int = 700) -> Optional[bytes
             qr_x = (width - qr_image.width) // 2
             qr_y = (height - qr_image.height) // 2 + 50  # Offset down a bit from center
 
-            # Paste QR code onto slide
-            img.paste(qr_image, (qr_x, qr_y))
+            # Paste QR code onto slide, respecting transparency if present
+            if qr_image.mode in ("RGBA", "LA", "P"):
+                qr_image = qr_image.convert("RGBA")
+                img.paste(qr_image, (qr_x, qr_y), qr_image)
+            else:
+                img.paste(qr_image, (qr_x, qr_y))
 
         except Exception as e:
             logger.error(f"Error loading QR code image: {e}")
