@@ -93,7 +93,7 @@ def main(file_path: str = "", sleep_time: float = DEFAULT_SLEEP_TIME) -> None:
             
             if slide_pdfs:
                 for pdf_bytes in slide_pdfs:
-                    _add_pdf_to_writer(pdf_writer, pdf_bytes)
+                    add_pdf_to_writer(pdf_writer, pdf_bytes)
                     total_slides += 1
             else:
                 logger.warning(f"No slides generated for: {search_term}")
@@ -150,7 +150,7 @@ def _get_search_terms(file_path: str) -> List[str]:
     return search_terms
 
 
-def _add_pdf_to_writer(pdf_writer: PdfWriter, pdf_bytes: bytes) -> None:
+def add_pdf_to_writer(pdf_writer: PdfWriter, pdf_bytes: bytes) -> None:
     """
     Add PDF pages to the writer.
     
@@ -178,7 +178,7 @@ def generate_slides_for_passage(search_term: str) -> List[bytes]:
     slides = []
     
     try:
-        passage_text = _fetch_passage_text(search_term)
+        passage_text = fetch_passage_text(search_term)
         if not passage_text:
             return slides
         
@@ -199,7 +199,7 @@ def generate_slides_for_passage(search_term: str) -> List[bytes]:
     return slides
 
 
-def _fetch_passage_text(search_term: str) -> List[str]:
+def fetch_passage_text(search_term: str) -> List[str]:
     """
     Fetch Bible passage text from BibleGateway.
     
@@ -572,10 +572,24 @@ def create_title_slide_with_qr(title: str, qr_size: int = 700) -> Optional[bytes
         return None
 
 if __name__ == "__main__":
-    import sys
-    
-    # Parse command line arguments
-    file_path = sys.argv[1] if len(sys.argv) > 1 else "Passages/short.txt"
-    sleep_time = float(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_SLEEP_TIME
-    
-    main(file_path, sleep_time)
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Generate PDF slides from a list of Bible passage references."
+    )
+    parser.add_argument(
+        "file",
+        nargs="?",
+        default="",
+        help="Path to a text file with one passage reference per line. "
+             "If omitted, references are entered interactively.",
+    )
+    parser.add_argument(
+        "--sleep",
+        type=float,
+        default=DEFAULT_SLEEP_TIME,
+        help=f"Delay in seconds between requests (default: {DEFAULT_SLEEP_TIME})",
+    )
+    args = parser.parse_args()
+
+    main(args.file, args.sleep)

@@ -5,20 +5,19 @@ A PyWebView-based GUI application for generating PDF slides from Bible passages.
 
 import json
 import logging
-import os
 import sys
 import threading
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Dict, Any
 
 import webview
 from sermon_slides_generator import (
     generate_slides_for_passage,
-    _fetch_passage_text,
-    create_title_slide_with_qr
+    fetch_passage_text,
+    create_title_slide_with_qr,
+    add_pdf_to_writer
 )
 from pypdf import PdfWriter
-import io
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -68,7 +67,7 @@ class SermonSlidesAPI:
         """Validate a single Bible passage reference."""
         try:
             # Try to fetch the passage to validate it exists
-            text = _fetch_passage_text(passage.strip())
+            text = fetch_passage_text(passage.strip())
             if text:
                 return {
                     'valid': True,
@@ -140,7 +139,7 @@ class SermonSlidesAPI:
             try:
                 title_slide_pdf = create_title_slide_with_qr(title.strip())
                 if title_slide_pdf:
-                    self._add_pdf_to_writer(pdf_writer, title_slide_pdf)
+                    add_pdf_to_writer(pdf_writer, title_slide_pdf)
                     total_slides += 1
                     logger.info("Title slide with QR code created")
                 else:
@@ -160,7 +159,7 @@ class SermonSlidesAPI:
                     
                     if slide_pdfs:
                         for pdf_bytes in slide_pdfs:
-                            self._add_pdf_to_writer(pdf_writer, pdf_bytes)
+                            add_pdf_to_writer(pdf_writer, pdf_bytes)
                             total_slides += 1
                     else:
                         logger.warning(f"No slides generated for: {passage}")
@@ -189,16 +188,6 @@ class SermonSlidesAPI:
             self._send_error(str(e))
         finally:
             self.is_generating = False
-    
-    def _add_pdf_to_writer(self, pdf_writer: PdfWriter, pdf_bytes: bytes) -> None:
-        """Add PDF pages to the writer."""
-        from pypdf import PdfReader
-        try:
-            pdf_reader = PdfReader(io.BytesIO(pdf_bytes))
-            for page in pdf_reader.pages:
-                pdf_writer.add_page(page)
-        except Exception as e:
-            logger.error(f"Error adding PDF to writer: {e}")
     
     def _update_progress(self, percent: int, message: str):
         """Send progress update to frontend."""
@@ -274,8 +263,8 @@ def create_app():
 def main():
     """Main entry point for the GUI application."""
     try:
-        window = create_app()
-        webview.start(debug=True if '--debug' in sys.argv else False)
+        create_app()
+        webview.start(debug='--debug' in sys.argv)
     except Exception as e:
         logger.error(f"Failed to start application: {e}")
         sys.exit(1)
