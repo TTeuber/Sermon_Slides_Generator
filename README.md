@@ -1,8 +1,12 @@
 # Sermon Slides Generator
 
+![CI](https://github.com/TTeuber/Sermon_Slides_Generator/actions/workflows/ci.yml/badge.svg)
+
 A macOS desktop app that turns a list of Bible references into presentation-ready PDF slides in seconds.
 
 I built this for my church: every week, someone had to manually look up each passage the sermon referenced, copy the text, and paste it slide-by-slide into a deck. This app does that whole job — type the references, click generate, and get a polished PDF with a title slide (with an optional QR code or logo image of your choice) and one or more cleanly formatted slides per passage.
+
+![The Sermon Slides Generator app](docs/gui_screenshot.png)
 
 ![Example slide](docs/example_slide.png)
 
